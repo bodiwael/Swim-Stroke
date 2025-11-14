@@ -14,16 +14,28 @@ class RecordingScreen extends StatefulWidget {
 
 class _RecordingScreenState extends State<RecordingScreen> {
   Timer? _timer;
-  int _elapsedSeconds = 0;
 
   @override
   void initState() {
     super.initState();
     _setupFileReceivedCallback();
+    _startTimerIfRecording();
     // Defer state reset until after build is complete
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _resetSessionState();
     });
+  }
+
+  void _startTimerIfRecording() {
+    // If recording is already in progress (user reconnected), start the UI timer
+    final btService = Provider.of<BluetoothService>(context, listen: false);
+    if (btService.isRecording && _timer == null) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {
+          // Timer just triggers UI updates, elapsed time is calculated from start time
+        });
+      });
+    }
   }
 
   void _resetSessionState() {
@@ -69,11 +81,10 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
     btService.startRecording();
 
-    // Start timer
-    _elapsedSeconds = 0;
+    // Start timer for UI updates
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _elapsedSeconds++;
+        // Timer just triggers UI updates, elapsed time is calculated from start time
       });
     });
   }
@@ -90,6 +101,11 @@ class _RecordingScreenState extends State<RecordingScreen> {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  int _getElapsedSeconds(BluetoothService btService) {
+    if (btService.recordingStartTime == null) return 0;
+    return DateTime.now().difference(btService.recordingStartTime!).inSeconds;
   }
 
   String _formatDuration(int seconds) {
@@ -120,7 +136,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                   // Timer
                   if (btService.isRecording)
                     Text(
-                      _formatDuration(_elapsedSeconds),
+                      _formatDuration(_getElapsedSeconds(btService)),
                       style: Theme.of(context).textTheme.displayLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             fontFeatureSettings: const [

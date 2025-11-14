@@ -34,6 +34,9 @@ class BluetoothService extends ChangeNotifier {
   String _fileName = '';
   List<int> _fileBuffer = [];
 
+  // Recording time tracking
+  DateTime? _recordingStartTime;
+
   // Getters
   BluetoothConnectionState get connectionState => _connectionState;
   RecordingState get recordingState => _recordingState;
@@ -41,6 +44,7 @@ class BluetoothService extends ChangeNotifier {
   BluetoothDevice? get connectedDevice => _connectedDevice;
   String get statusMessage => _statusMessage;
   String get errorMessage => _errorMessage;
+  DateTime? get recordingStartTime => _recordingStartTime;
 
   bool get isConnected => _connectionState == BluetoothConnectionState.connected;
   bool get isRecording => _recordingState == RecordingState.recording;
@@ -143,6 +147,7 @@ class BluetoothService extends ChangeNotifier {
   Future<void> startRecording() async {
     await sendCommand('SS');
     _recordingState = RecordingState.recording;
+    _recordingStartTime = DateTime.now();
     _statusMessage = 'Recording started';
     notifyListeners();
   }
@@ -238,6 +243,7 @@ class BluetoothService extends ChangeNotifier {
   // Set recording state back to idle
   void resetRecordingState() {
     _recordingState = RecordingState.idle;
+    _recordingStartTime = null;
     _statusMessage = '';
     notifyListeners();
   }

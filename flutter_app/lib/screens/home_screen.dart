@@ -136,20 +136,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildDeviceList(BluetoothService btService) {
     if (btService.devicesList.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.bluetooth_searching, size: 64, color: Colors.grey),
-            const SizedBox(height: 16),
-            const Text('No paired devices found'),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () => btService.scanForDevices(),
-              icon: const Icon(Icons.refresh),
-              label: const Text('Scan Again'),
+      return SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.bluetooth_searching,
+                    size: 64, color: Colors.grey),
+                const SizedBox(height: 16),
+                const Text('No paired devices found'),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () => btService.scanForDevices(),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Scan Again'),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     }
@@ -177,57 +183,65 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildConnectedView(BluetoothService btService) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.pool, size: 100, color: Colors.blue),
-          const SizedBox(height: 24),
-          Text(
-            'Ready to Track',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Your device is connected and ready to record swimming sessions',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey),
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const RecordingScreen(),
+    return SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.pool, size: 100, color: Colors.blue),
+              const SizedBox(height: 24),
+              Text(
+                'Ready to Track',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(height: 16),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 32.0),
+                child: Text(
+                  'Your device is connected and ready to record swimming sessions',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey),
                 ),
-              );
-            },
-            icon: const Icon(Icons.play_arrow, size: 32),
-            label: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: Text(
-                'Start New Session',
-                style: TextStyle(fontSize: 18),
               ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RecordingScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.play_arrow, size: 32),
+                label: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  child: Text(
+                    'Start New Session',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(height: 16),
+              TextButton.icon(
+                onPressed: () {
+                  btService.requestStatus();
+                },
+                icon: const Icon(Icons.info_outline),
+                label: const Text('Check Device Status'),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          TextButton.icon(
-            onPressed: () {
-              btService.requestStatus();
-            },
-            icon: const Icon(Icons.info_outline),
-            label: const Text('Check Device Status'),
-          ),
-        ],
+        ),
       ),
     );
   }

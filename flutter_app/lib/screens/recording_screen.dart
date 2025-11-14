@@ -27,12 +27,17 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
   void _resetSessionState() {
-    // Reset recording state and clear old data when starting a new session
+    // Reset recording state and clear old data only if previous session is complete
     final btService = Provider.of<BluetoothService>(context, listen: false);
     final dataProcessor = Provider.of<DataProcessor>(context, listen: false);
 
-    btService.resetRecordingState();
-    dataProcessor.reset();
+    // Only reset if we're coming from a completed session (processing state)
+    // Don't reset if user is in the middle of recording and just reconnected
+    if (btService.recordingState == RecordingState.processing ||
+        btService.recordingState == RecordingState.downloading) {
+      btService.resetRecordingState();
+      dataProcessor.reset();
+    }
   }
 
   void _setupFileReceivedCallback() {

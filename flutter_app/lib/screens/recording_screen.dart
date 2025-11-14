@@ -19,7 +19,17 @@ class _RecordingScreenState extends State<RecordingScreen> {
   @override
   void initState() {
     super.initState();
+    _resetSessionState();
     _setupFileReceivedCallback();
+  }
+
+  void _resetSessionState() {
+    // Reset recording state and clear old data when starting a new session
+    final btService = Provider.of<BluetoothService>(context, listen: false);
+    final dataProcessor = Provider.of<DataProcessor>(context, listen: false);
+
+    btService.resetRecordingState();
+    dataProcessor.reset();
   }
 
   void _setupFileReceivedCallback() {
@@ -44,6 +54,11 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   void _startRecording() {
     final btService = Provider.of<BluetoothService>(context, listen: false);
+    final dataProcessor = Provider.of<DataProcessor>(context, listen: false);
+
+    // Clear any previous session data before starting
+    dataProcessor.reset();
+
     btService.startRecording();
 
     // Start timer

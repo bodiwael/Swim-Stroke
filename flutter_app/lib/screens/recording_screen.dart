@@ -19,8 +19,11 @@ class _RecordingScreenState extends State<RecordingScreen> {
   @override
   void initState() {
     super.initState();
-    _resetSessionState();
     _setupFileReceivedCallback();
+    // Defer state reset until after build is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _resetSessionState();
+    });
   }
 
   void _resetSessionState() {

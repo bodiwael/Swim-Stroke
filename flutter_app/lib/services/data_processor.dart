@@ -108,11 +108,19 @@ class DataProcessor extends ChangeNotifier {
       // Parse CSV
       List<List<dynamic>> csvData = const CsvToListConverter().convert(csvString);
 
-      // Skip header row
+      // Skip header row and parse data rows
       _rawData.clear();
-      for (int i = 1; i < csvData.length; i++) {
+      for (int i = 0; i < csvData.length; i++) {
         var row = csvData[i];
-        if (row.length >= 7) {
+
+        // Skip if row doesn't have enough columns
+        if (row.length < 7) continue;
+
+        // Skip header row (check if first column is "timestamp" string)
+        if (row[0].toString().toLowerCase().contains('timestamp')) continue;
+
+        // Try to parse the row, skip if invalid
+        try {
           _rawData.add(SensorDataPoint(
             timestamp: int.parse(row[0].toString()),
             ax: double.parse(row[1].toString()),
@@ -122,6 +130,10 @@ class DataProcessor extends ChangeNotifier {
             gy: double.parse(row[5].toString()),
             gz: double.parse(row[6].toString()),
           ));
+        } catch (e) {
+          // Skip invalid rows
+          debugPrint('Skipping invalid row $i: $e');
+          continue;
         }
       }
 

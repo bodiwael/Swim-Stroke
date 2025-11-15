@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swim Stroke Tracker - Power System & Magnetic Alignment Schematic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+        }
+        .schematic {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .legend {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .legend-item {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+        }
+        .legend-color {
+            width: 30px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid #333;
+            display: inline-block;
+        }
+        .notes {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .warning {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        @media print {
+            body { background-color: white; }
+            .container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Swimming Stroke Tracker</h1>
+        <h1>Power System & Magnetic Alignment Schematic</h1>
+
+        <div class="legend">
+            <h3>Component Legend</h3>
+            <div class="legend-item"><span class="legend-color" style="background-color: #e74c3c;"></span> Power (+) / Positive Connections</div>
+            <div class="legend-item"><span class="legend-color" style="background-color: #34495e;"></span> Ground (-) / Negative Connections</div>
+            <div class="legend-item"><span class="legend-color" style="background-color: #3498db;"></span> Components / Modules</div>
+            <div class="legend-item"><span class="legend-color" style="background-color: #2ecc71;"></span> I2C / SPI Data Connections</div>
+            <div class="legend-item"><span class="legend-color" style="background-color: #9b59b6;"></span> Wireless Charging Components</div>
+            <div class="legend-item"><span class="legend-color" style="background-color: #e67e22;"></span> Magnets (Alignment System)</div>
+        </div>
+
+        <h2>1. Complete Power Circuit Diagram</h2>
+        <div class="schematic">
+            <svg width="1000" height="600" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <rect width="1000" height="600" fill="#fafafa"/>
+
+                <!-- Title -->
+                <text x="500" y="30" font-size="20" font-weight="bold" text-anchor="middle" fill="#2c3e50">Power System Wiring Diagram</text>
+
+                <!-- 18650 Battery -->
+                <rect x="50" y="100" width="120" height="80" fill="#3498db" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                <text x="110" y="130" font-size="14" font-weight="bold" text-anchor="middle" fill="white">18650 Battery</text>
+                <text x="110" y="150" font-size="12" text-anchor="middle" fill="white">3.7V 3000mAh</text>
+                <text x="30" y="115" font-size="12" fill="#e74c3c" font-weight="bold">+</text>
+                <text x="30" y="175" font-size="12" fill="#34495e" font-weight="bold">−</text>
+
+                <!-- Power Switch -->
+                <circle cx="250" cy="110" r="25" fill="#95a5a6" stroke="#2c3e50" stroke-width="2"/>
+                <text x="250" y="115" font-size="12" font-weight="bold" text-anchor="middle" fill="white">SWITCH</text>
+                <line x1="225" y1="110" x2="205" y2="110" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="275" y1="110" x2="295" y2="110" stroke="#e74c3c" stroke-width="3"/>
+
+                <!-- Connection: Battery+ to Switch -->
+                <line x1="170" y1="110" x2="225" y2="110" stroke="#e74c3c" stroke-width="3"/>
+                <text x="190" y="105" font-size="10" fill="#e74c3c">BAT+</text>
+
+                <!-- TP4056 Module -->
+                <rect x="350" y="80" width="180" height="180" fill="#3498db" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                <text x="440" y="110" font-size="16" font-weight="bold" text-anchor="middle" fill="white">TP4056</text>
+                <text x="440" y="130" font-size="12" text-anchor="middle" fill="white">Charging Module</text>
+
+                <!-- TP4056 Input Pins -->
+                <rect x="340" y="145" width="10" height="10" fill="#9b59b6"/>
+                <text x="325" y="153" font-size="10" fill="#9b59b6">IN+</text>
+                <rect x="340" y="165" width="10" height="10" fill="#34495e"/>
+                <text x="325" y="173" font-size="10" fill="#34495e">IN−</text>
+
+                <!-- TP4056 Battery Pins -->
+                <rect x="530" y="145" width="10" height="10" fill="#e74c3c"/>
+                <text x="545" y="153" font-size="10" fill="#e74c3c">BAT+</text>
+                <rect x="530" y="165" width="10" height="10" fill="#34495e"/>
+                <text x="545" y="173" font-size="10" fill="#34495e">BAT−</text>
+
+                <!-- TP4056 Output Pins -->
+                <rect x="530" y="215" width="10" height="10" fill="#e74c3c"/>
+                <text x="545" y="223" font-size="10" fill="#e74c3c">OUT+</text>
+                <rect x="530" y="235" width="10" height="10" fill="#34495e"/>
+                <text x="545" y="243" font-size="10" fill="#34495e">OUT−</text>
+
+                <!-- Connection: Switch to TP4056 BAT+ -->
+                <line x1="295" y1="110" x2="345" y2="110" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="345" y1="110" x2="345" y2="150" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="345" y1="150" x2="530" y2="150" stroke="#e74c3c" stroke-width="3"/>
+
+                <!-- Connection: Battery− to TP4056 BAT− -->
+                <line x1="170" y1="170" x2="345" y2="170" stroke="#34495e" stroke-width="3"/>
+                <line x1="345" y1="170" x2="530" y2="170" stroke="#34495e" stroke-width="3"/>
+                <text x="190" y="190" font-size="10" fill="#34495e">BAT−</text>
+
+                <!-- Wireless Charging RX Coil -->
+                <ellipse cx="250" cy="350" rx="60" ry="50" fill="#9b59b6" stroke="#2c3e50" stroke-width="2"/>
+                <text x="250" y="345" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Qi RX</text>
+                <text x="250" y="365" font-size="11" text-anchor="middle" fill="white">Coil (5V)</text>
+
+                <!-- Connection: RX Coil to TP4056 IN+ -->
+                <line x1="250" y1="300" x2="250" y2="150" stroke="#9b59b6" stroke-width="3"/>
+                <line x1="250" y1="150" x2="350" y2="150" stroke="#9b59b6" stroke-width="3"/>
+                <text x="255" y="225" font-size="10" fill="#9b59b6">5V</text>
+
+                <!-- Connection: RX Coil to TP4056 IN− -->
+                <line x1="310" y1="350" x2="345" y2="350" stroke="#34495e" stroke-width="3"/>
+                <line x1="345" y1="350" x2="345" y2="170" stroke="#34495e" stroke-width="3"/>
+                <text x="320" y="345" font-size="10" fill="#34495e">GND</text>
+
+                <!-- ESP32 Module -->
+                <rect x="650" y="150" width="150" height="150" fill="#3498db" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                <text x="725" y="185" font-size="16" font-weight="bold" text-anchor="middle" fill="white">ESP32</text>
+                <text x="725" y="205" font-size="11" text-anchor="middle" fill="white">Development</text>
+                <text x="725" y="220" font-size="11" text-anchor="middle" fill="white">Board</text>
+
+                <!-- ESP32 Power Pins -->
+                <rect x="640" y="215" width="10" height="10" fill="#e74c3c"/>
+                <text x="620" y="223" font-size="10" fill="#e74c3c">VIN</text>
+                <rect x="640" y="235" width="10" height="10" fill="#34495e"/>
+                <text x="620" y="243" font-size="10" fill="#34495e">GND</text>
+
+                <!-- Connection: TP4056 OUT+ to ESP32 VIN -->
+                <line x1="540" y1="220" x2="640" y2="220" stroke="#e74c3c" stroke-width="3"/>
+
+                <!-- Connection: TP4056 OUT− to ESP32 GND -->
+                <line x1="540" y1="240" x2="640" y2="240" stroke="#34495e" stroke-width="3"/>
+
+                <!-- MPU6050 Sensor -->
+                <rect x="850" y="80" width="120" height="90" fill="#2ecc71" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                <text x="910" y="110" font-size="14" font-weight="bold" text-anchor="middle" fill="white">MPU6050</text>
+                <text x="910" y="130" font-size="11" text-anchor="middle" fill="white">IMU Sensor</text>
+                <text x="870" y="160" font-size="9" fill="white">I2C: 21,22</text>
+
+                <!-- SD Card Module -->
+                <rect x="850" y="200" width="120" height="90" fill="#2ecc71" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                <text x="910" y="230" font-size="14" font-weight="bold" text-anchor="middle" fill="white">SD Card</text>
+                <text x="910" y="250" font-size="11" text-anchor="middle" fill="white">Module</text>
+                <text x="860" y="280" font-size="9" fill="white">SPI: 4,18,19,23</text>
+
+                <!-- Connection lines from ESP32 to sensors -->
+                <line x1="800" y1="190" x2="850" y2="125" stroke="#2ecc71" stroke-width="2" stroke-dasharray="5,5"/>
+                <line x1="800" y1="240" x2="850" y2="245" stroke="#2ecc71" stroke-width="2" stroke-dasharray="5,5"/>
+
+                <!-- Arrows -->
+                <defs>
+                    <marker id="arrowred" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#e74c3c" />
+                    </marker>
+                    <marker id="arrowblack" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#34495e" />
+                    </marker>
+                </defs>
+
+                <!-- Current flow indicators -->
+                <text x="50" y="450" font-size="12" font-weight="bold" fill="#2c3e50">Power Flow:</text>
+                <text x="50" y="470" font-size="11" fill="#2c3e50">1. Battery → Switch → TP4056 (BAT+/BAT−)</text>
+                <text x="50" y="490" font-size="11" fill="#2c3e50">2. Qi RX Coil → TP4056 (IN+/IN−) for charging</text>
+                <text x="50" y="510" font-size="11" fill="#2c3e50">3. TP4056 → ESP32 (OUT+/OUT− to VIN/GND)</text>
+                <text x="50" y="530" font-size="11" fill="#2c3e50">4. ESP32 → Sensors (3.3V power + data lines)</text>
+
+                <!-- Voltage labels -->
+                <text x="110" y="95" font-size="11" fill="#e74c3c" font-weight="bold">3.7-4.2V</text>
+                <text x="440" y="275" font-size="11" fill="#e74c3c" font-weight="bold">~4V</text>
+                <text x="725" y="250" font-size="11" fill="#2ecc71" font-weight="bold">3.3V out</text>
+            </svg>
+        </div>
+
+        <h2>2. Magnetic Alignment System - Top View</h2>
+        <div class="schematic">
+            <svg width="1000" height="700" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <rect width="1000" height="700" fill="#fafafa"/>
+
+                <!-- Title -->
+                <text x="500" y="30" font-size="20" font-weight="bold" text-anchor="middle" fill="#2c3e50">Magnetic Alignment System (Top View)</text>
+
+                <!-- Device Side (RX) -->
+                <text x="250" y="70" font-size="16" font-weight="bold" text-anchor="middle" fill="#2c3e50">DEVICE (Waterproof Box)</text>
+                <text x="250" y="90" font-size="12" text-anchor="middle" fill="#666">RX Side - Back Panel</text>
+
+                <!-- Device box -->
+                <rect x="100" y="120" width="300" height="220" fill="#ecf0f1" stroke="#2c3e50" stroke-width="3" rx="10"/>
+
+                <!-- Qi RX Coil -->
+                <ellipse cx="250" cy="230" rx="60" ry="50" fill="#9b59b6" stroke="#2c3e50" stroke-width="2"/>
+                <text x="250" y="225" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Qi RX</text>
+                <text x="250" y="245" font-size="12" text-anchor="middle" fill="white">Coil</text>
+
+                <!-- Device Magnets -->
+                <!-- M1 - Top Left - North -->
+                <circle cx="135" cy="155" r="18" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="135" y="160" font-size="16" font-weight="bold" text-anchor="middle" fill="white">N</text>
+                <text x="135" y="145" font-size="10" font-weight="bold" text-anchor="middle" fill="#2c3e50">M1</text>
+
+                <!-- M2 - Top Right - South -->
+                <circle cx="365" cy="155" r="18" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="365" y="160" font-size="16" font-weight="bold" text-anchor="middle" fill="white">S</text>
+                <text x="365" y="145" font-size="10" font-weight="bold" text-anchor="middle" fill="#2c3e50">M2</text>
+
+                <!-- M3 - Bottom Left - South -->
+                <circle cx="135" cy="305" r="18" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="135" y="310" font-size="16" font-weight="bold" text-anchor="middle" fill="white">S</text>
+                <text x="135" y="330" font-size="10" font-weight="bold" text-anchor="middle" fill="#2c3e50">M3</text>
+
+                <!-- M4 - Bottom Right - North -->
+                <circle cx="365" cy="305" r="18" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="365" y="310" font-size="16" font-weight="bold" text-anchor="middle" fill="white">N</text>
+                <text x="365" y="330" font-size="10" font-weight="bold" text-anchor="middle" fill="#2c3e50">M4</text>
+
+                <!-- Distance annotations for device -->
+                <line x1="135" y1="230" x2="190" y2="230" stroke="#c0392b" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="165" y="225" font-size="10" fill="#c0392b">15-20mm</text>
+                <line x1="250" y1="180" x2="250" y2="155" stroke="#c0392b" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="255" y="170" font-size="10" fill="#c0392b">15-20mm</text>
+
+                <!-- Component labels inside device -->
+                <text x="250" y="365" font-size="10" text-anchor="middle" fill="#555">Components: ESP32, MPU6050,</text>
+                <text x="250" y="380" font-size="10" text-anchor="middle" fill="#555">SD Card, TP4056, Battery, Switch</text>
+
+                <!-- Charging Dock Side (TX) -->
+                <text x="750" y="70" font-size="16" font-weight="bold" text-anchor="middle" fill="#2c3e50">CHARGING DOCK</text>
+                <text x="750" y="90" font-size="12" text-anchor="middle" fill="#666">TX Side - Top Panel</text>
+
+                <!-- Dock box -->
+                <rect x="600" y="120" width="300" height="220" fill="#d5dbdb" stroke="#2c3e50" stroke-width="3" rx="10"/>
+
+                <!-- Qi TX Coil -->
+                <ellipse cx="750" cy="230" rx="60" ry="50" fill="#9b59b6" stroke="#2c3e50" stroke-width="2"/>
+                <text x="750" y="225" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Qi TX</text>
+                <text x="750" y="245" font-size="12" text-anchor="middle" fill="white">Coil</text>
+
+                <!-- Dock Magnets - OPPOSITE POLARITY -->
+                <!-- M1 - Top Left - South (opposite of device) -->
+                <circle cx="635" cy="155" r="18" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="635" y="160" font-size="16" font-weight="bold" text-anchor="middle" fill="white">S</text>
+                <text x="635" y="145" font-size="10" font-weight="bold" text-anchor="middle" fill="#2c3e50">M1</text>
+
+                <!-- M2 - Top Right - North -->
+                <circle cx="865" cy="155" r="18" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="865" y="160" font-size="16" font-weight="bold" text-anchor="middle" fill="white">N</text>
+                <text x="865" y="145" font-size="10" font-weight="bold" text-anchor="middle" fill="#2c3e50">M2</text>
+
+                <!-- M3 - Bottom Left - North -->
+                <circle cx="635" cy="305" r="18" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="635" y="310" font-size="16" font-weight="bold" text-anchor="middle" fill="white">N</text>
+                <text x="635" y="330" font-size="10" font-weight="bold" text-anchor="middle" fill="#2c3e50">M3</text>
+
+                <!-- M4 - Bottom Right - South -->
+                <circle cx="865" cy="305" r="18" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="865" y="310" font-size="16" font-weight="bold" text-anchor="middle" fill="white">S</text>
+                <text x="865" y="330" font-size="10" font-weight="bold" text-anchor="middle" fill="#2c3e50">M4</text>
+
+                <!-- 5V Power input label -->
+                <text x="750" y="365" font-size="11" text-anchor="middle" fill="#555" font-weight="bold">5V 1A Power Input</text>
+                <text x="750" y="380" font-size="10" text-anchor="middle" fill="#555">(Wall adapter)</text>
+
+                <!-- Polarity Pattern Info -->
+                <rect x="50" y="420" width="450" height="120" fill="#fff3cd" stroke="#ffc107" stroke-width="2" rx="5"/>
+                <text x="275" y="445" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">Polarity Pattern</text>
+                <text x="70" y="470" font-size="12" fill="#2c3e50">Device (RX): N - S - S - N (clockwise from top-left)</text>
+                <text x="70" y="490" font-size="12" fill="#2c3e50">Dock (TX): S - N - N - S (opposite polarity)</text>
+                <text x="70" y="510" font-size="12" font-weight="bold" fill="#c0392b">Result: All corners ATTRACT (N↔S pairing)</text>
+                <text x="70" y="530" font-size="11" fill="#555">Total holding force: ~4-8 kg</text>
+
+                <!-- Magnet Specifications -->
+                <rect x="530" y="420" width="450" height="120" fill="#e8f5e9" stroke="#2ecc71" stroke-width="2" rx="5"/>
+                <text x="755" y="445" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">Magnet Specifications</text>
+                <text x="550" y="470" font-size="12" fill="#2c3e50">Type: Neodymium (NdFeB), N35 or N42 grade</text>
+                <text x="550" y="490" font-size="12" fill="#2c3e50">Size: 6mm diameter × 2-3mm thickness</text>
+                <text x="550" y="510" font-size="12" fill="#2c3e50">Quantity: 8 total (4 device + 4 dock)</text>
+                <text x="550" y="530" font-size="12" fill="#2c3e50">Coating: Ni-Cu-Ni (nickel, waterproof)</text>
+
+                <!-- Magnetic attraction arrows -->
+                <line x1="450" y1="230" x2="550" y2="230" stroke="#c0392b" stroke-width="3" marker-end="url(#arrowmag)"/>
+                <line x1="550" y1="230" x2="450" y2="230" stroke="#c0392b" stroke-width="3" marker-start="url(#arrowmag)"/>
+                <text x="500" y="220" font-size="12" font-weight="bold" text-anchor="middle" fill="#c0392b">MAGNETIC</text>
+                <text x="500" y="250" font-size="12" font-weight="bold" text-anchor="middle" fill="#c0392b">ATTRACTION</text>
+
+                <defs>
+                    <marker id="arrowmag" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#c0392b" />
+                    </marker>
+                </defs>
+
+                <!-- Air gap annotation -->
+                <text x="500" y="280" font-size="11" text-anchor="middle" fill="#555">Air gap: 2-5mm (optimal)</text>
+            </svg>
+        </div>
+
+        <h2>3. Side View - Wireless Charging & Magnet Alignment</h2>
+        <div class="schematic">
+            <svg width="1000" height="450" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <rect width="1000" height="450" fill="#fafafa"/>
+
+                <!-- Title -->
+                <text x="500" y="30" font-size="20" font-weight="bold" text-anchor="middle" fill="#2c3e50">Side View - Charging Configuration</text>
+
+                <!-- Device (RX) - Waterproof Box -->
+                <rect x="100" y="100" width="250" height="120" fill="#3498db" stroke="#2c3e50" stroke-width="3" rx="5"/>
+                <text x="225" y="90" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">DEVICE (Waterproof Box)</text>
+                <text x="225" y="125" font-size="12" text-anchor="middle" fill="white">ESP32 + Components</text>
+
+                <!-- RX Coil in device -->
+                <rect x="190" y="180" width="70" height="30" fill="#9b59b6" stroke="#2c3e50" stroke-width="2" rx="3"/>
+                <text x="225" y="200" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Qi RX Coil</text>
+
+                <!-- Device Magnets -->
+                <circle cx="120" cy="205" r="12" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="120" y="210" font-size="10" font-weight="bold" text-anchor="middle" fill="white">M</text>
+                <circle cx="330" cy="205" r="12" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="330" y="210" font-size="10" font-weight="bold" text-anchor="middle" fill="white">M</text>
+
+                <!-- Distance annotation - magnet to coil -->
+                <line x1="132" y1="205" x2="180" y2="195" stroke="#c0392b" stroke-width="1" stroke-dasharray="2,2"/>
+                <text x="155" y="195" font-size="9" fill="#c0392b">15-20mm</text>
+
+                <!-- Charging Dock (TX) -->
+                <rect x="100" y="280" width="250" height="100" fill="#95a5a6" stroke="#2c3e50" stroke-width="3" rx="5"/>
+                <text x="225" y="395" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">CHARGING DOCK</text>
+
+                <!-- TX Coil in dock -->
+                <rect x="190" y="250" width="70" height="30" fill="#9b59b6" stroke="#2c3e50" stroke-width="2" rx="3"/>
+                <text x="225" y="270" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Qi TX Coil</text>
+
+                <!-- Dock Magnets -->
+                <circle cx="120" cy="255" r="12" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="120" y="260" font-size="10" font-weight="bold" text-anchor="middle" fill="white">M</text>
+                <circle cx="330" cy="255" r="12" fill="#e67e22" stroke="#2c3e50" stroke-width="2"/>
+                <text x="330" y="260" font-size="10" font-weight="bold" text-anchor="middle" fill="white">M</text>
+
+                <!-- Air gap between device and dock -->
+                <line x1="225" y1="220" x2="225" y2="250" stroke="#c0392b" stroke-width="2" stroke-dasharray="5,5"/>
+                <text x="240" y="235" font-size="11" font-weight="bold" fill="#c0392b">Air Gap</text>
+                <text x="240" y="250" font-size="10" fill="#c0392b">2-5mm</text>
+
+                <!-- Electromagnetic field lines -->
+                <path d="M 225 210 Q 150 230 225 250" stroke="#9b59b6" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+                <path d="M 225 210 Q 300 230 225 250" stroke="#9b59b6" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+                <path d="M 225 210 Q 175 230 225 250" stroke="#9b59b6" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+                <path d="M 225 210 Q 275 230 225 250" stroke="#9b59b6" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+
+                <!-- Magnetic field indicators -->
+                <path d="M 120 217 C 120 240 120 235 120 243" stroke="#e67e22" stroke-width="2" marker-end="url(#arroworange)"/>
+                <path d="M 120 243 C 120 235 120 240 120 217" stroke="#e67e22" stroke-width="2" marker-start="url(#arroworange)"/>
+                <text x="80" y="230" font-size="10" fill="#e67e22" font-weight="bold">Magnetic</text>
+                <text x="80" y="242" font-size="10" fill="#e67e22" font-weight="bold">Attraction</text>
+
+                <defs>
+                    <marker id="arroworange" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L7,3 z" fill="#e67e22" />
+                    </marker>
+                </defs>
+
+                <!-- Specifications Box -->
+                <rect x="450" y="100" width="500" height="280" fill="#ecf0f1" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                <text x="700" y="130" font-size="16" font-weight="bold" text-anchor="middle" fill="#2c3e50">Key Measurements & Specifications</text>
+
+                <text x="470" y="160" font-size="13" font-weight="bold" fill="#2c3e50">Wireless Charging:</text>
+                <text x="470" y="180" font-size="12" fill="#555">• Qi standard (110-205 kHz AC field)</text>
+                <text x="470" y="200" font-size="12" fill="#555">• Input: 5V 1A from TX coil</text>
+                <text x="470" y="220" font-size="12" fill="#555">• Output: 5V 450-800mA to TP4056</text>
+                <text x="470" y="240" font-size="12" fill="#555">• Charging time: 3-5 hours (3000mAh)</text>
+
+                <text x="470" y="270" font-size="13" font-weight="bold" fill="#2c3e50">Magnet Placement:</text>
+                <text x="470" y="290" font-size="12" fill="#555">• Distance from coil center: 15-20mm minimum</text>
+                <text x="470" y="310" font-size="12" fill="#555">• Magnet size: 6mm × 2-3mm (N35/N42)</text>
+                <text x="470" y="330" font-size="12" fill="#555">• Installation depth: Flush with surface</text>
+                <text x="470" y="350" font-size="12" fill="#555">• Drill hole: 6.5mm diameter, 2.5-3mm deep</text>
+                <text x="470" y="370" font-size="12" fill="#555">• Adhesive: Waterproof epoxy + silicone seal</text>
+            </svg>
+        </div>
+
+        <div class="notes">
+            <h3>Important Notes:</h3>
+            <ul>
+                <li><strong>Magnet placement is CRITICAL:</strong> Magnets must be at least 15-20mm from the center of the Qi coil to avoid interference.</li>
+                <li><strong>Opposite polarity creates attraction:</strong> Device magnets (N-S-S-N) attract to dock magnets (S-N-N-S).</li>
+                <li><strong>Waterproofing:</strong> All magnets on the device side must be sealed with waterproof epoxy and silicone sealant.</li>
+                <li><strong>Efficiency loss:</strong> Properly placed magnets should cause less than 10% charging efficiency loss.</li>
+                <li><strong>Air gap:</strong> Keep 2-5mm gap between device and charging dock for optimal wireless charging.</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ What to AVOID:</h3>
+            <ul>
+                <li><strong>DO NOT</strong> place magnets directly on or under the Qi coil - this will significantly reduce charging efficiency!</li>
+                <li><strong>DO NOT</strong> use ferromagnetic screws (steel/iron) near the coils - use brass, aluminum, or stainless steel 316.</li>
+                <li><strong>DO NOT</strong> use magnets larger than 10mm diameter or thicker than 4mm.</li>
+                <li><strong>DO NOT</strong> use super-strong N52 grade magnets - N35 or N42 is sufficient.</li>
+                <li><strong>DO NOT</strong> forget to test waterproofing before swimming - water damage can destroy all electronics!</li>
+            </ul>
+        </div>
+
+        <div class="notes">
+            <h3>Bill of Materials (BOM) - Power System:</h3>
+            <table border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                <tr style="background-color: #3498db; color: white;">
+                    <th>Component</th>
+                    <th>Specification</th>
+                    <th>Quantity</th>
+                    <th>Est. Price (USD)</th>
+                </tr>
+                <tr>
+                    <td>18650 Li-ion Battery</td>
+                    <td>3.7V, 3000mAh, protected</td>
+                    <td>1</td>
+                    <td>$5-8</td>
+                </tr>
+                <tr>
+                    <td>TP4056 Charging Module</td>
+                    <td>With protection circuit</td>
+                    <td>1</td>
+                    <td>$1-2</td>
+                </tr>
+                <tr>
+                    <td>Qi Wireless RX Coil</td>
+                    <td>5V output, with rectifier</td>
+                    <td>1</td>
+                    <td>$3-5</td>
+                </tr>
+                <tr>
+                    <td>Qi Wireless TX Pad</td>
+                    <td>5V 1A input</td>
+                    <td>1</td>
+                    <td>$5-10</td>
+                </tr>
+                <tr>
+                    <td>Power Switch (SPDT)</td>
+                    <td>Toggle or slide switch</td>
+                    <td>1</td>
+                    <td>$0.50-1</td>
+                </tr>
+                <tr>
+                    <td>Neodymium Magnets</td>
+                    <td>6mm × 2-3mm, N35, Ni-coated</td>
+                    <td>8-12</td>
+                    <td>$1-2</td>
+                </tr>
+                <tr>
+                    <td>5V 1A Power Adapter</td>
+                    <td>For charging dock</td>
+                    <td>1</td>
+                    <td>$3-5</td>
+                </tr>
+                <tr>
+                    <td>Waterproof Epoxy</td>
+                    <td>2-part epoxy, marine grade</td>
+                    <td>1 tube</td>
+                    <td>$5-8</td>
+                </tr>
+                <tr>
+                    <td>Silicone Sealant</td>
+                    <td>Marine/waterproof grade</td>
+                    <td>1 tube</td>
+                    <td>$3-5</td>
+                </tr>
+                <tr style="background-color: #ecf0f1; font-weight: bold;">
+                    <td colspan="3">TOTAL (Power System Only)</td>
+                    <td>$27-46</td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding: 20px; background-color: #ecf0f1; border-radius: 5px;">
+            <p style="font-size: 12px; color: #666;">
+                Swimming Stroke Tracker - Power System Schematic<br>
+                Generated: 2025<br>
+                For complete assembly instructions, see: docs/WIRING_DIAGRAM.md
+            </p>
+        </div>
+    </div>
+</body>
+</html>

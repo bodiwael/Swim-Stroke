@@ -48,6 +48,46 @@ This project provides a **waterproof, wireless swimming stroke tracker** that me
 
 **Total Cost:** ~$30-40 USD
 
+## ⚡ Power System & Wireless Charging
+
+### Magnetic Alignment System
+
+The device features a **magnetic alignment system** for effortless wireless charging:
+
+- **Qi Wireless Charging** - 5V 1A, cable-free charging
+- **Magnetic Auto-Alignment** - Device snaps into perfect position on charging dock
+- **8 Neodymium Magnets** - 4 on device + 4 on charging dock (6mm × 2-3mm, N35 grade)
+- **No Interference** - Magnets placed 15-20mm from Qi coils to maintain charging efficiency
+- **Waterproof Sealed** - All magnets sealed with epoxy and silicone
+
+### Power Circuit
+
+```
+18650 Battery (3.7V) → Power Switch → TP4056 → ESP32 (VIN)
+                                        ↑
+                                   Qi RX Coil (5V wireless charging)
+```
+
+### Battery Performance
+
+- **Capacity:** 3000mAh 18650 Li-ion battery
+- **Runtime:** 3-4 hours continuous recording @ 50Hz
+- **Charging Time:** 3-5 hours (wireless charging)
+- **Protection:** TP4056 with over-charge, over-discharge, and short-circuit protection
+
+### Documentation
+
+- **[📐 Wiring Diagram](docs/WIRING_DIAGRAM.md)** - Complete power circuit, magnet installation, and assembly instructions
+- **[🎨 Visual Schematic](docs/power_system_schematic.html)** - Interactive HTML diagrams (open in browser)
+- **[🔧 Setup Guide](docs/SETUP_GUIDE.md)** - Step-by-step hardware assembly and testing
+
+**Key Features:**
+- ✅ Magnetic snap-on charging (4-8kg holding force)
+- ✅ No cables needed for charging
+- ✅ Waterproof magnet installation with detailed instructions
+- ✅ <10% charging efficiency loss with properly placed magnets
+- ✅ Easy to build charging dock with standard Qi transmitter
+
 ## 📱 Mobile App
 
 Built with **Flutter** for cross-platform support (Android/iOS):
@@ -125,22 +165,26 @@ Swim-Stroke/
 │   │       └── data_processor.dart
 │   └── pubspec.yaml
 ├── docs/
-│   ├── WIRING_DIAGRAM.md     # Hardware connections
-│   └── SETUP_GUIDE.md        # Detailed setup instructions
-└── README.md                  # This file
+│   ├── WIRING_DIAGRAM.md          # Hardware connections & magnet installation
+│   ├── power_system_schematic.html # Interactive visual diagrams
+│   └── SETUP_GUIDE.md             # Detailed setup instructions
+└── README.md                       # This file
 ```
 
 ## 🚀 Quick Start
 
 ### 1. Hardware Assembly
 
-See [docs/WIRING_DIAGRAM.md](docs/WIRING_DIAGRAM.md) for detailed wiring instructions.
+See [docs/WIRING_DIAGRAM.md](docs/WIRING_DIAGRAM.md) for detailed wiring instructions and [docs/power_system_schematic.html](docs/power_system_schematic.html) for visual diagrams.
 
 **Quick Summary:**
 - Connect MPU6050 to ESP32 I2C (SDA=21, SCL=22)
 - Connect SD Module to ESP32 SPI (CS=4, MOSI=23, MISO=19, SCK=18)
-- Wire battery → TP4056 → ESP32
-- Assemble in waterproof box
+- Wire battery → Switch → TP4056 → ESP32
+- Connect Qi RX coil to TP4056 (IN+/IN−) for wireless charging
+- Install 4 magnets on device back panel (15-20mm from Qi coil)
+- Build charging dock with Qi TX coil and 4 magnets (opposite polarity)
+- Assemble in waterproof box with proper sealing
 
 ### 2. Flash ESP32 Firmware
 

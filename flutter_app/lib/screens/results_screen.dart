@@ -14,6 +14,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   final TextEditingController _poolLengthController = TextEditingController();
   final TextEditingController _lapsController = TextEditingController();
 
+  double _sensitivity = 0.25; // Current threshold
+  double _minStrokeTime = 0.8; // Minimum time between strokes in seconds
+
   @override
   void dispose() {
     _poolLengthController.dispose();
@@ -78,12 +81,108 @@ class _ResultsScreenState extends State<ResultsScreen> {
     );
   }
 
+  void _showSensitivityDialog() {
+    final dataProcessor = Provider.of<DataProcessor>(context, listen: false);
+
+    setState(() {
+      _sensitivity = dataProcessor.peakThreshold;
+      _minStrokeTime = dataProcessor.minPeakDistanceMs / 1000.0;
+    });
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Adjust Stroke Detection'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'If stroke count is incorrect, adjust these settings:',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Sensitivity: ${_sensitivity.toStringAsFixed(2)}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Slider(
+                  value: _sensitivity,
+                  min: 0.05,
+                  max: 0.6,
+                  divisions: 55,
+                  label: _sensitivity.toStringAsFixed(2),
+                  onChanged: (value) {
+                    setDialogState(() {
+                      _sensitivity = value;
+                    });
+                  },
+                ),
+                const Text(
+                  'Lower = More sensitive (detects more strokes)\nHigher = Less sensitive (detects fewer strokes)',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Min Time Between Strokes: ${_minStrokeTime.toStringAsFixed(1)}s',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Slider(
+                  value: _minStrokeTime,
+                  min: 0.3,
+                  max: 2.0,
+                  divisions: 17,
+                  label: '${_minStrokeTime.toStringAsFixed(1)}s',
+                  onChanged: (value) {
+                    setDialogState(() {
+                      _minStrokeTime = value;
+                    });
+                  },
+                ),
+                const Text(
+                  'Adjust based on your swimming speed',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                dataProcessor.adjustSensitivity(
+                  _sensitivity,
+                  (_minStrokeTime * 1000).round(),
+                );
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Reprocessing with new settings...')),
+                );
+              },
+              child: const Text('Apply'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Session Results'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.tune),
+            tooltip: 'Adjust Detection',
+            onPressed: _showSensitivityDialog,
+          ),
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {

@@ -22,6 +22,9 @@ class SensorDataPoint {
 
   // Calculate magnitude of rotation
   double get rotationMagnitude => sqrt(gx * gx + gy * gy + gz * gz);
+
+  // Combined motion metric (gyro is primary, accel is secondary)
+  double get combinedMotion => rotationMagnitude * 0.7 + accelerationMagnitude * 0.0003;
 }
 
 class StrokePeak {
@@ -83,10 +86,10 @@ class DataProcessor extends ChangeNotifier {
   bool _isProcessing = false;
   String _statusMessage = '';
 
-  // Processing parameters
-  static const int calibrationSeconds = 10; // Remove first and last 10 seconds
-  static const double peakThreshold = 0.6; // Relative threshold for peak detection
-  static const int minPeakDistance = 500; // Minimum 0.5 seconds between peaks
+  // Adjustable processing parameters
+  double peakThreshold = 0.25; // MUCH LOWER - more sensitive detection
+  int minPeakDistanceMs = 800; // Milliseconds between strokes (was samples!)
+  int calibrationSeconds = 5; // Adaptive - will adjust based on session duration
 
   // Getters
   List<SensorDataPoint> get rawData => _rawData;
@@ -144,27 +147,51 @@ class DataProcessor extends ChangeNotifier {
   Future<void> _processData() async {
     if (_rawData.isEmpty) return;
 
-    // Step 1: Remove calibration periods (first and last 10 seconds)
+    // Adaptive calibration based on session duration
+    int sessionDurationSeconds = (_rawData.last.timestamp - _rawData.first.timestamp) ~/ 1000;
+
+    // For sessions < 30 seconds, use 3 second calibration
+    // For sessions 30-60 seconds, use 5 second calibration
+    // For sessions > 60 seconds, use 8 second calibration
+    if (sessionDurationSeconds < 30) {
+      calibrationSeconds = 3;
+    } else if (sessionDurationSeconds < 60) {
+      calibrationSeconds = 5;
+    } else {
+      calibrationSeconds = 8;
+    }
+
+    debugPrint('Session duration: ${sessionDurationSeconds}s, using ${calibrationSeconds}s calibration');
+
+    // Step 1: Remove calibration periods
     _processedData = _removeCalibrationPeriods(_rawData);
 
-    debugPrint(
-        'After calibration removal: ${_processedData.length} data points');
+    debugPrint('After calibration removal: ${_processedData.length} data points');
 
-    // Step 2: Calculate signal features
-    List<double> rotationSignal = _processedData.map((d) => d.rotationMagnitude).toList();
+    if (_processedData.length < 10) {
+      debugPrint('Not enough data after calibration removal');
+      _metrics = null;
+      return;
+    }
 
-    // Step 3: Apply low-pass filter to remove noise
-    List<double> filteredSignal = _applyLowPassFilter(rotationSignal);
+    // Step 2: Calculate combined motion signal (gyro + accel)
+    List<double> motionSignal = _processedData.map((d) => d.combinedMotion).toList();
 
-    // Step 4: Normalize signal
+    // Step 3: Apply median filter first to remove spikes
+    List<double> medianFiltered = _applyMedianFilter(motionSignal, 3);
+
+    // Step 4: Apply low-pass filter to smooth
+    List<double> filteredSignal = _applyLowPassFilter(medianFiltered, 7);
+
+    // Step 5: Normalize signal
     List<double> normalizedSignal = _normalizeSignal(filteredSignal);
 
-    // Step 5: Detect peaks (strokes)
-    List<StrokePeak> peaks = _detectPeaks(normalizedSignal);
+    // Step 6: Detect peaks (strokes) with improved algorithm
+    List<StrokePeak> peaks = _detectPeaksImproved(normalizedSignal);
 
-    debugPrint('Detected ${peaks.length} strokes');
+    debugPrint('Detected ${peaks.length} strokes with threshold $peakThreshold');
 
-    // Step 6: Calculate metrics
+    // Step 7: Calculate metrics
     _calculateMetrics(peaks);
   }
 
@@ -176,22 +203,40 @@ class DataProcessor extends ChangeNotifier {
     int endTime = data.last.timestamp;
     int totalDuration = endTime - startTime;
 
-    // If session is too short, don't remove calibration
-    if (totalDuration < calibrationMs * 2) {
-      debugPrint('Session too short for calibration removal');
-      return data;
+    // If session is too short, use minimal calibration
+    int actualCalibrationMs = calibrationMs;
+    if (totalDuration < calibrationMs * 3) {
+      actualCalibrationMs = totalDuration ~/ 10; // Use 10% at each end
+      debugPrint('Short session - using ${actualCalibrationMs}ms calibration');
     }
 
     return data
         .where((point) =>
-            point.timestamp >= startTime + calibrationMs &&
-            point.timestamp <= endTime - calibrationMs)
+            point.timestamp >= startTime + actualCalibrationMs &&
+            point.timestamp <= endTime - actualCalibrationMs)
         .toList();
   }
 
-  List<double> _applyLowPassFilter(List<double> signal) {
-    // Simple moving average filter
-    const int windowSize = 5;
+  List<double> _applyMedianFilter(List<double> signal, int windowSize) {
+    List<double> filtered = [];
+
+    for (int i = 0; i < signal.length; i++) {
+      List<double> window = [];
+
+      for (int j = max(0, i - windowSize ~/ 2);
+          j < min(signal.length, i + windowSize ~/ 2 + 1);
+          j++) {
+        window.add(signal[j]);
+      }
+
+      window.sort();
+      filtered.add(window[window.length ~/ 2]);
+    }
+
+    return filtered;
+  }
+
+  List<double> _applyLowPassFilter(List<double> signal, int windowSize) {
     List<double> filtered = [];
 
     for (int i = 0; i < signal.length; i++) {
@@ -223,32 +268,56 @@ class DataProcessor extends ChangeNotifier {
     return signal.map((value) => (value - minVal) / range).toList();
   }
 
-  List<StrokePeak> _detectPeaks(List<double> signal) {
+  List<StrokePeak> _detectPeaksImproved(List<double> signal) {
     List<StrokePeak> peaks = [];
 
     if (signal.length < 3) return peaks;
 
-    // Calculate adaptive threshold
+    // Calculate statistics for adaptive threshold
     double mean = signal.reduce((a, b) => a + b) / signal.length;
-    double threshold = mean + peakThreshold * (1.0 - mean);
 
-    debugPrint('Peak detection threshold: $threshold');
+    // Calculate standard deviation
+    double variance = signal.map((x) => pow(x - mean, 2)).reduce((a, b) => a + b) / signal.length;
+    double stdDev = sqrt(variance);
 
-    int lastPeakIndex = -minPeakDistance;
+    // Adaptive threshold: mean + (threshold factor * std dev)
+    // This works better than the old formula
+    double threshold = mean + (peakThreshold * stdDev * 2);
 
-    for (int i = 1; i < signal.length - 1; i++) {
-      // Check if this is a local maximum
-      if (signal[i] > signal[i - 1] && signal[i] > signal[i + 1]) {
+    // Ensure threshold is at least at mean level
+    threshold = max(threshold, mean * 1.1);
+
+    debugPrint('Signal stats - Mean: ${mean.toStringAsFixed(3)}, StdDev: ${stdDev.toStringAsFixed(3)}');
+    debugPrint('Peak detection threshold: ${threshold.toStringAsFixed(3)}');
+
+    // Convert minPeakDistanceMs to samples (assuming ~50Hz sampling)
+    int minPeakDistanceSamples = (minPeakDistanceMs / 20).round(); // 20ms per sample at 50Hz
+
+    debugPrint('Min peak distance: ${minPeakDistanceMs}ms = $minPeakDistanceSamples samples');
+
+    int lastPeakIndex = -minPeakDistanceSamples * 2;
+
+    for (int i = 2; i < signal.length - 2; i++) {
+      // More robust peak detection: check if it's higher than 2 neighbors on each side
+      bool isLocalMax = signal[i] > signal[i - 1] &&
+                        signal[i] > signal[i + 1] &&
+                        signal[i] >= signal[i - 2] &&
+                        signal[i] >= signal[i + 2];
+
+      if (isLocalMax) {
         // Check if above threshold
         if (signal[i] > threshold) {
           // Check minimum distance from last peak
-          if (i - lastPeakIndex >= minPeakDistance) {
+          if (i - lastPeakIndex >= minPeakDistanceSamples) {
             peaks.add(StrokePeak(
               timestamp: _processedData[i].timestamp,
               value: signal[i],
               index: i,
             ));
             lastPeakIndex = i;
+            debugPrint('Peak found at index $i, value: ${signal[i].toStringAsFixed(3)}');
+          } else {
+            debugPrint('Peak at $i rejected (too close to previous: ${i - lastPeakIndex} samples)');
           }
         }
       }
@@ -300,9 +369,20 @@ class DataProcessor extends ChangeNotifier {
     }
   }
 
+  // Manual sensitivity adjustment
+  void adjustSensitivity(double newThreshold, int newMinDistance) {
+    peakThreshold = newThreshold;
+    minPeakDistanceMs = newMinDistance;
+
+    // Reprocess with new parameters
+    if (_rawData.isNotEmpty) {
+      _processData();
+    }
+  }
+
   // Get processed signal for visualization
   List<double> getProcessedSignal() {
-    return _processedData.map((d) => d.rotationMagnitude).toList();
+    return _processedData.map((d) => d.combinedMotion).toList();
   }
 
   List<double> getAccelerationSignal() {

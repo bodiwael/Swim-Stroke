@@ -227,12 +227,16 @@ void sendFileViaBluetooth() {
   // Get file size
   unsigned long fileSize = file.size();
 
-  // Send file header
-  SerialBT.println("FILE_START");
+  // Send file metadata first (before FILE_START)
   SerialBT.println("SIZE:" + String(fileSize));
   SerialBT.println("NAME:" + currentFileName);
 
-  delay(100); // Give receiver time to prepare
+  delay(50); // Give receiver time to process metadata
+
+  // Send file start marker
+  SerialBT.println("FILE_START");
+
+  delay(100); // Give receiver time to prepare for data
 
   // Send file data in chunks
   const int CHUNK_SIZE = 512;

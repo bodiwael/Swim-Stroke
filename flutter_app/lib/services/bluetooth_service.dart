@@ -215,6 +215,12 @@ class BluetoothService extends ChangeNotifier {
       _statusMessage = 'File received: ${_fileBuffer.length} bytes';
       debugPrint('File transfer complete: ${_fileBuffer.length} bytes');
 
+      // Debug: Show first 500 characters of received data
+      String previewData = String.fromCharCodes(_fileBuffer.take(500).toList());
+      debugPrint('=== FILE DATA PREVIEW (first 500 chars) ===');
+      debugPrint(previewData);
+      debugPrint('=== END PREVIEW ===');
+
       // Trigger callback with file data
       _onFileReceived(_fileBuffer);
 

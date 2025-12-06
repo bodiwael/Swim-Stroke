@@ -108,16 +108,32 @@ class DataProcessor extends ChangeNotifier {
       // Parse CSV
       List<List<dynamic>> csvData = const CsvToListConverter().convert(csvString);
 
+      debugPrint('=== CSV PARSING DEBUG ===');
+      debugPrint('Total CSV rows found: ${csvData.length}');
+      if (csvData.isNotEmpty) {
+        debugPrint('First row: ${csvData[0]}');
+        if (csvData.length > 1) {
+          debugPrint('Second row: ${csvData[1]}');
+        }
+      }
+
       // Skip header row and parse data rows
       _rawData.clear();
+      int skippedRows = 0;
       for (int i = 0; i < csvData.length; i++) {
         var row = csvData[i];
 
         // Skip if row doesn't have enough columns
-        if (row.length < 7) continue;
+        if (row.length < 7) {
+          skippedRows++;
+          continue;
+        }
 
         // Skip header row (check if first column is "timestamp" string)
-        if (row[0].toString().toLowerCase().contains('timestamp')) continue;
+        if (row[0].toString().toLowerCase().contains('timestamp')) {
+          debugPrint('Skipping header row: $row');
+          continue;
+        }
 
         // Try to parse the row, skip if invalid
         try {
@@ -132,12 +148,13 @@ class DataProcessor extends ChangeNotifier {
           ));
         } catch (e) {
           // Skip invalid rows
-          debugPrint('Skipping invalid row $i: $e');
+          debugPrint('Skipping invalid row $i: $e - Row data: $row');
+          skippedRows++;
           continue;
         }
       }
 
-      debugPrint('Loaded ${_rawData.length} data points');
+      debugPrint('Loaded ${_rawData.length} data points (skipped $skippedRows rows)');
 
       // Process the data
       await _processData();
@@ -188,17 +205,25 @@ class DataProcessor extends ChangeNotifier {
     int endTime = data.last.timestamp;
     int totalDuration = endTime - startTime;
 
+    debugPrint('=== CALIBRATION REMOVAL ===');
+    debugPrint('Total duration: ${totalDuration}ms (${totalDuration / 1000}s)');
+    debugPrint('Calibration period: ${calibrationMs}ms (${calibrationSeconds}s)');
+    debugPrint('Input data points: ${data.length}');
+
     // If session is too short, don't remove calibration
     if (totalDuration < calibrationMs * 2) {
-      debugPrint('Session too short for calibration removal');
+      debugPrint('Session too short for calibration removal - returning all data');
       return data;
     }
 
-    return data
+    var filtered = data
         .where((point) =>
             point.timestamp >= startTime + calibrationMs &&
             point.timestamp <= endTime - calibrationMs)
         .toList();
+
+    debugPrint('After calibration removal: ${filtered.length} data points');
+    return filtered;
   }
 
   List<double> _applyLowPassFilter(List<double> signal) {
@@ -238,13 +263,21 @@ class DataProcessor extends ChangeNotifier {
   List<StrokePeak> _detectPeaks(List<double> signal) {
     List<StrokePeak> peaks = [];
 
-    if (signal.length < 3) return peaks;
+    debugPrint('=== PEAK DETECTION ===');
+    debugPrint('Signal length: ${signal.length}');
+
+    if (signal.length < 3) {
+      debugPrint('Signal too short for peak detection');
+      return peaks;
+    }
 
     // Calculate adaptive threshold
     double mean = signal.reduce((a, b) => a + b) / signal.length;
     double threshold = mean + peakThreshold * (1.0 - mean);
 
+    debugPrint('Signal mean: $mean');
     debugPrint('Peak detection threshold: $threshold');
+    debugPrint('Min peak distance: ${minPeakDistance}ms');
 
     int lastPeakIndex = -minPeakDistance;
 
@@ -266,11 +299,24 @@ class DataProcessor extends ChangeNotifier {
       }
     }
 
+    debugPrint('Total peaks found: ${peaks.length}');
+    if (peaks.isNotEmpty) {
+      debugPrint('First peak at: ${peaks.first.timestamp}ms, value: ${peaks.first.value}');
+      if (peaks.length > 1) {
+        debugPrint('Last peak at: ${peaks.last.timestamp}ms, value: ${peaks.last.value}');
+      }
+    }
+
     return peaks;
   }
 
   void _calculateMetrics(List<StrokePeak> peaks) {
+    debugPrint('=== METRICS CALCULATION ===');
+    debugPrint('Peaks detected: ${peaks.length}');
+    debugPrint('Processed data points: ${_processedData.length}');
+
     if (peaks.isEmpty || _processedData.isEmpty) {
+      debugPrint('ERROR: No metrics generated - peaks: ${peaks.length}, data: ${_processedData.length}');
       _metrics = null;
       return;
     }

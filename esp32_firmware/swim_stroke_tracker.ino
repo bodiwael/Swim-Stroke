@@ -121,9 +121,38 @@ void handleCommand(String command) {
     sendStatus();
   } else if (command == "DELETE") {
     deleteLastFile();
+  } else if (command == "DEBUG") {
+    debugPrintFile();
   } else {
     SerialBT.println("ERROR:Unknown command");
   }
+}
+
+void debugPrintFile() {
+  if (currentFileName == "") {
+    Serial.println("No file to debug");
+    return;
+  }
+
+  File file = SD.open(currentFileName, FILE_READ);
+  if (!file) {
+    Serial.println("Failed to open file for debug");
+    return;
+  }
+
+  Serial.println("=== FILE DEBUG ===");
+  Serial.println("File: " + currentFileName);
+  Serial.println("Size: " + String(file.size()) + " bytes");
+  Serial.println("First 500 characters:");
+
+  int count = 0;
+  while (file.available() && count < 500) {
+    Serial.write(file.read());
+    count++;
+  }
+
+  file.close();
+  Serial.println("\n=== END DEBUG ===");
 }
 
 void startRecording() {
@@ -165,6 +194,7 @@ void stopRecording() {
   isRecording = false;
 
   if (dataFile) {
+    dataFile.flush(); // Ensure all data is written to SD card
     dataFile.close();
   }
 
@@ -259,6 +289,11 @@ void sendFileViaBluetooth() {
   }
 
   file.close();
+
+  // Verify all bytes were sent
+  if (bytesSent != fileSize) {
+    Serial.println("WARNING: Bytes mismatch! Expected: " + String(fileSize) + ", Sent: " + String(bytesSent));
+  }
 
   // Send end marker
   delay(100);

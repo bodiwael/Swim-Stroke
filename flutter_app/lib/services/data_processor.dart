@@ -85,8 +85,8 @@ class DataProcessor extends ChangeNotifier {
 
   // Processing parameters
   static const int calibrationSeconds = 10; // Remove first and last 10 seconds
-  static const double peakThreshold = 0.6; // Relative threshold for peak detection
-  static const int minPeakDistance = 500; // Minimum 0.5 seconds between peaks
+  double _peakThreshold = 0.6; // Relative threshold for peak detection
+  int _minPeakDistance = 500; // Minimum 0.5 seconds between peaks
 
   // Getters
   List<SensorDataPoint> get rawData => _rawData;
@@ -94,6 +94,10 @@ class DataProcessor extends ChangeNotifier {
   SwimSessionMetrics? get metrics => _metrics;
   bool get isProcessing => _isProcessing;
   String get statusMessage => _statusMessage;
+
+  // Expose processing parameters for UI adjustment
+  double get peakThreshold => _peakThreshold;
+  int get minPeakDistanceMs => _minPeakDistance;
 
   // Process file data
   Future<void> processFileData(List<int> fileData) async {
@@ -273,13 +277,13 @@ class DataProcessor extends ChangeNotifier {
 
     // Calculate adaptive threshold
     double mean = signal.reduce((a, b) => a + b) / signal.length;
-    double threshold = mean + peakThreshold * (1.0 - mean);
+    double threshold = mean + _peakThreshold * (1.0 - mean);
 
     debugPrint('Signal mean: $mean');
     debugPrint('Peak detection threshold: $threshold');
-    debugPrint('Min peak distance: ${minPeakDistance}ms');
+    debugPrint('Min peak distance: ${_minPeakDistance}ms');
 
-    int lastPeakIndex = -minPeakDistance;
+    int lastPeakIndex = -_minPeakDistance;
 
     for (int i = 1; i < signal.length - 1; i++) {
       // Check if this is a local maximum
@@ -287,7 +291,7 @@ class DataProcessor extends ChangeNotifier {
         // Check if above threshold
         if (signal[i] > threshold) {
           // Check minimum distance from last peak
-          if (i - lastPeakIndex >= minPeakDistance) {
+          if (i - lastPeakIndex >= _minPeakDistance) {
             peaks.add(StrokePeak(
               timestamp: _processedData[i].timestamp,
               value: signal[i],
@@ -354,6 +358,23 @@ class DataProcessor extends ChangeNotifier {
   void addPoolInfo(double poolLength, int laps) {
     if (_metrics != null) {
       _metrics!.calculateStrokeLength(poolLength, laps);
+      notifyListeners();
+    }
+  }
+
+  // Adjust sensitivity parameters and reprocess data
+  Future<void> adjustSensitivity(double sensitivity, double minStrokeTime) async {
+    _peakThreshold = sensitivity;
+    _minPeakDistance = (minStrokeTime * 1000).toInt(); // Convert seconds to milliseconds
+
+    // Reprocess if we have data
+    if (_rawData.isNotEmpty) {
+      _isProcessing = true;
+      notifyListeners();
+
+      await _processData();
+
+      _isProcessing = false;
       notifyListeners();
     }
   }
